@@ -1,0 +1,12 @@
+# Python venv (Windows/Linux)
+.venv/
+venv/
+Stego-web/Back-end/.venv-linux/
+**/.venv-linux/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
