@@ -1,6 +1,7 @@
 import os, base64, uuid
 from flask import Flask, request, jsonify, send_from_directory, url_for, abort
 from flask_cors import CORS
+from database import init_db, insert_log, hash_secret
 from stego import embed_lsb_2bit, extract_lsb_2bit  # <— pakai modul yang baru
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -14,6 +15,8 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 app = Flask(__name__, static_folder=FRONT_DIR, static_url_path="/static")
 CORS(app)
+init_db()
+
 
 app.config["MAX_CONTENT_LENGTH"] = 25 * 1024 * 1024  # naikin dikit
 
@@ -69,6 +72,15 @@ def api_encrypt():
     with open(out_path, "wb") as f:
         f.write(stego_png_bytes)
 
+    insert_log(
+        file_id=file_id,
+        action="encrypt",
+        original_path=orig_path,
+        cover_path=cover_path,
+        stego_path=out_path,
+        secret_hash=hash_secret(secret),
+    )
+
     preview_b64 = base64.b64encode(stego_png_bytes).decode("utf-8")
     return jsonify(
         ok=True,
@@ -76,6 +88,7 @@ def api_encrypt():
         download_url=url_for("download_output", file_id=file_id, _external=False),
         preview=f"data:image/png;base64,{preview_b64}",
     )
+
 
 @app.post("/api/decrypt")
 def api_decrypt():

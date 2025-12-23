@@ -614,3 +614,7 @@ body{
   font-size: 14px;
   opacity: .9;
 }
+/* Saat masuk mode hasil (unduh), sembunyikan judul + toggle */
+body.is-result #appHeader{
+  display: none !important;
+}
