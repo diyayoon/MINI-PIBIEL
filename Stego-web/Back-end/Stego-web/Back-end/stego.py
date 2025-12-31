@@ -1,3 +1,4 @@
+# stego.py
 from PIL import Image
 import io, hashlib
 
@@ -85,22 +86,24 @@ def embed_lsb_2bit(cover_path: str, original_bytes: bytes, original_ext: str, ke
 
     payload = _build_payload(original_bytes, original_ext, key)
     needed_bits = len(payload) * 8
-    capacity_bits = w * h * 3 * 2 
+    capacity_bits = w * h * 3 * 2  # 2 LSB x 3 channel
 
     if needed_bits > capacity_bits:
         raise ValueError(f"Payload terlalu besar ({len(payload)} bytes) untuk cover ini. "
                          f"Maks ~{capacity_bits//8} bytes. Gunakan cover yang lebih besar atau file asli yang lebih kecil.")
 
+    # tanam
     chunks = _bytes_to_2bit_chunks(payload)
     chans_mod = list(chans)
     i = 0
     for two_bits in chunks:
         chans_mod[i] = (chans_mod[i] & 0b11111100) | (two_bits & 0b11)
         i += 1
+    # sisanya biarkan
 
     out_im = _channels_to_img(w, h, chans_mod)
     buf = io.BytesIO()
-    out_im.save(buf, format='PNG')
+    out_im.save(buf, format='PNG')  # simpan sebagai PNG agar LSB tidak rusak
     return buf.getvalue()
 
 def extract_lsb_2bit(stego_path: str, key: str) -> bytes:
@@ -108,6 +111,8 @@ def extract_lsb_2bit(stego_path: str, key: str) -> bytes:
     im = Image.open(stego_path)
     im, w, h, chans = _img_to_channels(im)
 
+    # kita tidak tahu panjang payload; baca bertahap:
+    # 1) baca dulu 5 byte awal (MAGIC + ext_len)
     need_first = 5
     chunks = []
     total_bits_read = 0

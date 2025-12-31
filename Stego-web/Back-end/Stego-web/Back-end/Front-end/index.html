@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Peek A Boo Pic</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS path -->
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+
+  <input id="inp-original" type="file" accept="image/*" hidden data-role="original">
+  <input id="inp-cover"    type="file" accept="image/*" hidden data-role="cover">
+  <input id="inp-stego"    type="file" accept="image/*" hidden data-role="stego">
+
+  <div class="bg-art" aria-hidden="true"></div>
+
+  <!-- START SCREEN -->
+  <main id="startScreen" class="screen screen--start">
+    <div class="start-hero start-hero--figma">
+      <!-- Logo -->
+      <img class="start-logo" src="/static/logo-peekaboo.png" alt="Peek A Boo" />
+      <button id="btnStart" class="btn btn--start btn--start-figma" type="button">
+        START
+      </button>
+    </div>
+  </main>
+
+  <!-- APP SCREEN -->
+  <main id="appScreen" class="screen screen--app is-hidden" aria-hidden="true">
+    <header class="app-header" id="appHeader">
+      <h1 class="title">PEEK A BOO PIC</h1>
+      <p class="subtitle">
+        Platform enkripsi dan dekripsi gambar menggunakan teknik steganografi tingkat lanjut.
+        Lindungi data visual Anda dengan keamanan maksimal.
+      </p>
+
+      <div class="toggle">
+        <button class="toggle__btn is-active" type="button" data-tab="encrypt">
+          <span class="toggle__icon" aria-hidden="true">🔒</span> ENKRIPSI
+        </button>
+        <button class="toggle__btn" type="button" data-tab="decrypt">
+          <span class="toggle__icon" aria-hidden="true">👁️</span> DEKRIPSI
+        </button>
+        <div class="toggle__pill" aria-hidden="true"></div>
+      </div>
+    </header>
+
+    <section class="panel-wrap">
+      <!-- Sliding panels -->
+      <div id="panelRail" class="panel-rail" data-view="encrypt">
+        <!-- ENCRYPT PANEL -->
+        <section class="panel panel--encrypt" aria-label="Enkripsi">
+          <div class="section-head">
+            <div class="section-head__label">
+              <span class="badge-icon">🔒</span>
+              <span class="section-head__title">ENKRIPSI</span>
+            </div>
+            <div class="section-head__desc">
+              <div class="muted">Foto Asli</div>
+              <div class="tiny">Foto yang akan disembunyikan</div>
+            </div>
+            <div class="section-head__desc">
+              <div class="muted">Foto Penampung</div>
+              <div class="tiny">Wadah untuk foto asli</div>
+            </div>
+          </div>
+
+          <div class="dropgrid">
+            <div class="dropcard" data-uploader="cover">
+              <div class="dropcard__hdr">
+                <div class="dropcard__title">Foto Asli</div>
+              </div>
+              
+              <button class="dropcard__body" type="button" data-open-modal="cover" data-role="open-original">
+                <div class="drop__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="icon-dl" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M8 9l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4 17.5c0 1.38 1.12 2.5 2.5 2.5h11c1.38 0 2.5-1.12 2.5-2.5V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="droptext">
+                  <div>Drop file disini</div>
+                  <div class="tiny">atau klik untuk browse</div>
+                </div>
+              </button>
+              <div class="dropcard__footer">
+                <div class="filemeta" id="metaCover">Belum ada file</div>
+                <img id="previewCover" class="preview is-hidden" alt="Preview foto asli"/>
+              </div>
+            </div>
+
+            <div class="dropcard" data-uploader="payload">
+              <div class="dropcard__hdr">
+                <div class="dropcard__title">Foto Penampung</div>
+              </div>
+              
+              <button class="dropcard__body" type="button" data-open-modal="payload" data-role="open-cover">
+                <div class="drop__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="icon-dl" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M8 9l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4 17.5c0 1.38 1.12 2.5 2.5 2.5h11c1.38 0 2.5-1.12 2.5-2.5V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="droptext">
+                  <div>Drop file disini</div>
+                  <div class="tiny">atau klik untuk browse</div>
+                </div>
+              </button>
+              <div class="dropcard__footer">
+                <div class="filemeta" id="metaPayload">Belum ada file</div>
+                <img id="previewPayload" class="preview is-hidden" alt="Preview foto penampung"/>
+              </div>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field__label">Secret key</span>
+            <div class="field__control">
+              <span class="field__icon" aria-hidden="true">🔒</span>
+              <input id="encryptKey" type="password" inputmode="text" placeholder="Masukkan kunci Enkripsi yang aman" data-role="key-encrypt"/>
+            </div>
+          </label>
+
+          <button id="btnEncrypt" class="btn btn--primary" type="button" data-role="encrypt">
+            Mulai Enkripsi
+          </button>
+
+          <div class="stepper">
+            <div class="step is-active"><span class="step__n">1</span><div class="step__t">Upload<br><span>Pilih foto asli &amp; Penampung</span></div></div>
+            <div class="step"><span class="step__n">2</span><div class="step__t">Key<br><span>Masukkan Secret Key</span></div></div>
+            <div class="step"><span class="step__n">3</span><div class="step__t">Proses<br><span>Sistem Embed data</span></div></div>
+            <div class="step"><span class="step__n">4</span><div class="step__t">Generate<br><span>Buat foto stego</span></div></div>
+            <div class="step"><span class="step__n">5</span><div class="step__t">Download<br><span>Unduh Hasil</span></div></div>
+          </div>
+
+          <div class="features">
+            <div class="feature">
+              <div class="feature__icon">🛡️</div>
+              <div class="feature__txt">
+                <div class="feature__title">Keamanan Tinggi</div>
+                <div class="feature__desc">Enkripsi data dengan algoritma Steganografi</div>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="feature__icon">🔒</div>
+              <div class="feature__txt">
+                <div class="feature__title">Privasi terjaga</div>
+                <div class="feature__desc">Data anda tidak tersimpan di server</div>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="feature__icon">✅</div>
+              <div class="feature__txt">
+                <div class="feature__title">Mudah digunakan</div>
+                <div class="feature__desc">Interface intuitif dan user-friendly</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- DECRYPT PANEL -->
+        <section class="panel panel--decrypt" aria-label="Dekripsi">
+          <div class="section-head section-head--single">
+            <div class="section-head__label">
+              <span class="badge-icon">👁️</span>
+              <span class="section-head__title">DEKRIPSI</span>
+            </div>
+            <div class="section-head__desc2">
+              <div class="muted">Ekstrak foto asli dari foto stego</div>
+              <div class="tiny">Foto stego: foto hasil Enkripsi yang berisi data tersembunyi</div>
+            </div>
+          </div>
+
+          <div class="dropgrid dropgrid--single">
+            <div class="dropcard" data-uploader="stego">
+              <div class="dropcard__hdr">
+                <div class="dropcard__title">Foto Stego</div>
+              </div>
+              
+              <button class="dropcard__body dropcard__body--wide" type="button" data-open-modal="stego" data-role="open-stego">
+                <div class="drop__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="icon-dl" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M8 9l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4 17.5c0 1.38 1.12 2.5 2.5 2.5h11c1.38 0 2.5-1.12 2.5-2.5V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="droptext">
+                  <div>Drop file disini</div>
+                  <div class="tiny">atau klik untuk browse</div>
+                </div>
+              </button>
+              <div class="dropcard__footer">
+                <div class="filemeta" id="metaStego">Belum ada file</div>
+                <img id="previewStego" class="preview is-hidden" alt="Preview foto stego"/>
+              </div>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field__label">Secret key</span>
+            <div class="field__control field__control--gold">
+              <span class="field__icon" aria-hidden="true">🔐</span>
+              <input id="decryptKey" type="password" inputmode="text" placeholder="Masukkan kunci Dekripsi yang aman" data-role="key-decrypt"/>
+            </div>
+          </label>
+
+          <button id="btnDecrypt" class="btn btn--primary btn--gold" type="button" data-role="decrypt">
+            Mulai Dekripsi
+          </button>
+
+          <div class="stepper">
+            <div class="step is-active"><span class="step__n">1</span><div class="step__t">Upload<br><span>Pilih foto stego</span></div></div>
+            <div class="step"><span class="step__n">2</span><div class="step__t">Key<br><span>Masukkan Secret Key</span></div></div>
+            <div class="step"><span class="step__n">3</span><div class="step__t">Validasi<br><span>Verifikasi kunci</span></div></div>
+            <div class="step"><span class="step__n">4</span><div class="step__t">Ekstrak<br><span>Ambil data asli</span></div></div>
+            <div class="step"><span class="step__n">5</span><div class="step__t">Download<br><span>Unduh Hasil</span></div></div>
+          </div>
+
+          <div class="features">
+            <div class="feature">
+              <div class="feature__icon">🛡️</div>
+              <div class="feature__txt">
+                <div class="feature__title">Keamanan Tinggi</div>
+                <div class="feature__desc">Enkripsi data dengan algoritma Steganografi</div>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="feature__icon">🔒</div>
+              <div class="feature__txt">
+                <div class="feature__title">Privasi terjaga</div>
+                <div class="feature__desc">Data anda tidak tersimpan di server</div>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="feature__icon">✅</div>
+              <div class="feature__txt">
+                <div class="feature__title">Mudah digunakan</div>
+                <div class="feature__desc">Interface intuitif dan user-friendly</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- RESULT: ENCRYPT -->
+    <section id="resultEncrypt" class="result is-hidden" aria-hidden="true">
+      <button class="btn-back" type="button" data-back="app">Back</button>
+      <button id="btnDownloadStego" class="btn btn--download" type="button" data-role="download-stego">
+        ⬇ Unduh hasil Enkripsi
+      </button>
+    </section>
+
+    <!-- RESULT: DECRYPT -->
+    <section id="resultDecrypt" class="result is-hidden" aria-hidden="true">
+      <button class="btn-back" type="button" data-back="app">Back</button>
+      <button id="btnDownloadExtract" class="btn btn--download" type="button" data-role="download-extract">
+        ⬇ Unduh hasil Dekripsi
+      </button>
+    </section>
+  </main>
+
+  <!-- Upload Modal (tetap) -->
+  <div id="uploadModal" class="modal is-hidden" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__card" role="document">
+      <div class="modal__topbar">
+        <button id="modalUploadBtn" class="pill" type="button">Upload</button>
+        <button class="xbtn" type="button" aria-label="Close" data-close-modal>✕</button>
+      </div>
+
+      <div class="modal__drop">
+        <div class="modal__dropicon" aria-hidden="true">🖼️</div>
+        <div class="modal__droptxt">Drop file disini<br><span class="tiny">atau klik untuk browse</span></div>
+      </div>
+
+      <div class="modal__attach">
+        <div class="tiny muted">Attachment</div>
+        <div class="attach-row">
+          <input id="fileInput" type="file" accept="image/*" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script defer src="/static/app.js"></script>
+</body>
+</html>
