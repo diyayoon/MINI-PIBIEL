@@ -24,11 +24,11 @@ body{
   margin:0;
   color:var(--text);
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: transparent; /* background utama dari .bg-art */
+  background: transparent;
   overflow-x:hidden;
 }
 
-/* Background JPG */
+/* Background */
 .bg-art{
   position: fixed;
   inset: 0;
@@ -46,9 +46,7 @@ body{
 }
 .is-hidden{ display:none !important; }
 
-/* ==========================
-   START (Figma)
-========================== */
+/* LAMAN START */
 .screen--start{
   position: relative;
   height: 100vh;
@@ -80,7 +78,7 @@ body{
   pointer-events: none;
 }
 
-/* Buttons */
+/* TOMBOL */
 .btn{ border:0; cursor:pointer; }
 .btn--start{
   position:absolute;
@@ -107,13 +105,13 @@ body{
   z-index: 10;
   pointer-events: auto;
 }
-/* tombol START jangan loncat saat diklik */
+
 .btn--start:active,
 .btn--start-figma:active{
   transform: translate(-50%, -50%);
 }
 
-/* Mobile fine-tune */
+/* TAMPILAN DI MOBILE */
 @media (max-width: 600px){
   .start-logo{ top: 32%; width: clamp(240px, 75vw, 360px); }
   .btn--start-figma{ top: 80%; }
@@ -123,9 +121,7 @@ body{
   .btn--start-figma{ top: 82%; }
 }
 
-/* ==========================
-   APP
-========================== */
+/* TAMPILAN WEB */
 .screen--app{ flex-direction:column; gap: 18px; }
 
 .app-header{
@@ -166,7 +162,7 @@ body{
   line-height: 1.45;
 }
 
-/* Toggle */
+/* TOGGLE */
 .toggle{
   width: min(520px, calc(100vw - 32px));
   margin: 0 auto;
@@ -210,7 +206,7 @@ body{
 }
 .toggle__btn.is-active{ color: rgba(0,0,0,.85); }
 
-/* Panel wrap */
+/* PERPINDAHAN PANEL */
 .panel-wrap{
   width: var(--w);
   border-radius: 26px;
@@ -235,7 +231,7 @@ body{
     linear-gradient(180deg, rgba(0,0,0,.14), rgba(0,0,0,.22));
 }
 
-/* Section head + text helpers */
+/* BAGIAN UPLOAD */
 .section-head{
   display:grid;
   grid-template-columns: 1.1fr 1fr 1fr;
@@ -567,7 +563,7 @@ body{
   .panel{ padding: 18px 14px 16px; }
 }
 
-/* ENKRIPSI header (pakai versi terakhir aja) */
+/* ENKRIPSI HEADER */
 .panel--encrypt .section-head{
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -589,7 +585,7 @@ body{
   text-align: left;
 }
 
-/* DEKRIPSI header */
+/* DEKRIPSI HEADER */
 .panel--decrypt .section-head{
   display: grid;
   grid-template-columns: 1fr;
@@ -614,7 +610,7 @@ body{
   font-size: 14px;
   opacity: .9;
 }
-/* Saat masuk mode hasil (unduh), sembunyikan judul + toggle */
+/* nyembunyiin judul dan toggle di laman unduh */
 body.is-result #appHeader{
   display: none !important;
 }

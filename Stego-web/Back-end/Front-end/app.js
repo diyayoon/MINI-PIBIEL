@@ -1,4 +1,3 @@
-/* Peek A Boo Pic UI Flow - Terhubung ke Backend */
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
 
@@ -10,7 +9,7 @@ const panelRail   = $("#panelRail");
 const toggle      = $(".toggle");
 const toggleBtns  = $$(".toggle__btn");
 
-const appHeader   = $("#appHeader"); // <-- WAJIB ada di HTML
+const appHeader   = $("#appHeader");
 
 const uploadModal = $("#uploadModal");
 const fileInput   = $("#fileInput");
@@ -39,7 +38,7 @@ let currentUploadTarget = null;
 const state = {
   cover: null,    // foto asli
   payload: null,  // foto penampung
-  stego: null,    // foto stego (decrypt)
+  stego: null,    // foto stego
   generatedStegoBlob: null,
   extractedBlob: null
 };
@@ -55,9 +54,6 @@ function hide(el){
   el.setAttribute("aria-hidden","true");
 }
 
-/* =========================
-   NAV / VIEW HELPERS
-========================= */
 function setTab(tab){
   panelRail.dataset.view = tab;
   toggle.dataset.active = tab;
@@ -68,20 +64,15 @@ function goToApp(){
   hide(startScreen);
   show(appScreen);
   setTab("encrypt");
-  exitResultMode(); // pastikan mode normal
+  exitResultMode();
 }
 
 function enterResultMode(){
-  // body class dipakai untuk CSS hide header
   document.body.classList.add("is-result");
-
-  // sembunyikan panel utama
   hide($(".panel-wrap"));
-
-  // sembunyikan header (judul + subtitle + toggle)
   hide(appHeader);
 
-  // pastikan hanya 1 result yang tampil
+  //laman hasil (muncul salah satu)
   hide(resultEncrypt);
   hide(resultDecrypt);
 }
@@ -89,7 +80,7 @@ function enterResultMode(){
 function exitResultMode(){
   document.body.classList.remove("is-result");
 
-  // tampilkan panel utama + header
+  //tampil balik headernya
   show($(".panel-wrap"));
   show(appHeader);
 
@@ -98,22 +89,15 @@ function exitResultMode(){
   hide(resultDecrypt);
 }
 
-/* =========================
-   EVENTS: START + TOGGLE
-========================= */
 btnStart?.addEventListener("click", goToApp);
 
 toggleBtns.forEach(btn => {
   btn.addEventListener("click", () => {
-    // kalau lagi mode result, jangan bisa pindah tab
     if(document.body.classList.contains("is-result")) return;
     setTab(btn.dataset.tab);
   });
 });
 
-/* =========================
-   UPLOAD MODAL
-========================= */
 $$("[data-open-modal]").forEach(btn=>{
   btn.addEventListener("click", ()=>{
     currentUploadTarget = btn.dataset.openModal;
@@ -164,15 +148,12 @@ function renderFileMeta(target, file){
   }
 }
 
-/* =========================
-   ENCRYPT
-========================= */
+// enkripsi
 btnEncrypt?.addEventListener("click", async ()=>{
   if(!state.cover || !state.payload) return alert("Upload Foto Asli & Penampung dulu");
   if(!encryptKey.value.trim()) return alert("Secret key wajib diisi");
 
   const fd = new FormData();
-  // sesuaikan nama field dengan backend
   fd.append("original", state.cover);
   fd.append("cover", state.payload);
   fd.append("secret_key", encryptKey.value.trim());
@@ -182,7 +163,6 @@ btnEncrypt?.addEventListener("click", async ()=>{
     const j = await r.json();
     if(!j.ok) throw new Error(j.error || "Encrypt gagal");
 
-    // masuk mode hasil + tampilkan result encrypt
     enterResultMode();
     show(resultEncrypt);
 
@@ -190,7 +170,6 @@ btnEncrypt?.addEventListener("click", async ()=>{
       btnDownloadStego.onclick = ()=> (location.href = j.download_url);
     }
 
-    // preview stego (kalau backend ngirim base64 data url)
     if(j.preview?.startsWith("data:image")){
       previewPayload.src = j.preview;
       previewPayload.classList.remove("is-hidden");
@@ -200,9 +179,7 @@ btnEncrypt?.addEventListener("click", async ()=>{
   }
 });
 
-/* =========================
-   DECRYPT
-========================= */
+// dekripsi
 btnDecrypt?.addEventListener("click", async ()=>{
   if(!state.stego) return alert("Upload Foto Stego dulu");
   if(!decryptKey.value.trim()) return alert("Secret key wajib diisi");
@@ -216,7 +193,6 @@ btnDecrypt?.addEventListener("click", async ()=>{
     const j = await r.json();
     if(!j.ok) throw new Error(j.error || "Decrypt gagal");
 
-    // masuk mode hasil + tampilkan result decrypt
     enterResultMode();
     show(resultDecrypt);
 
@@ -224,7 +200,6 @@ btnDecrypt?.addEventListener("click", async ()=>{
       btnDownloadExtract.onclick = ()=> (location.href = j.download_url);
     }
 
-    // preview hasil ekstrak (kalau backend ngirim base64 data url)
     if(j.preview?.startsWith("data:image")){
       previewStego.src = j.preview;
       previewStego.classList.remove("is-hidden");
@@ -234,16 +209,11 @@ btnDecrypt?.addEventListener("click", async ()=>{
   }
 });
 
-/* =========================
-   BACK BUTTONS
-========================= */
+//tombol kembali dari hasil
 $$("[data-back='app']").forEach(btn=>{
   btn.addEventListener("click", ()=> exitResultMode());
 });
 
-/* =========================
-   DRAG & DROP
-========================= */
 ["cover","payload","stego"].forEach(target=>{
   const card = document.querySelector(`[data-uploader="${target}"]`);
   if(!card) return;

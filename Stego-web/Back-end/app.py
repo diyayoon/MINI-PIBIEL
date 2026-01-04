@@ -1,10 +1,9 @@
 import os, base64, uuid
 from flask import Flask, request, jsonify, send_from_directory, url_for, abort
 from flask_cors import CORS
-from stego import embed_lsb_2bit, extract_lsb_2bit  # <— pakai modul yang baru
+from stego import embed_lsb_2bit, extract_lsb_2bit
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-# NOTE: sesuaikan FRONT_DIR jika app.py kamu berada di subfolder Back-end
 FRONT_DIR = os.path.join(APP_ROOT, "Front-end")
 UPLOAD_DIR = os.path.join(APP_ROOT, "storage", "uploads")
 OUTPUT_DIR = os.path.join(APP_ROOT, "storage", "outputs")
@@ -15,7 +14,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 app = Flask(__name__, static_folder=FRONT_DIR, static_url_path="/static")
 CORS(app)
 
-app.config["MAX_CONTENT_LENGTH"] = 25 * 1024 * 1024  # naikin dikit
+app.config["MAX_CONTENT_LENGTH"] = 25 * 1024 * 1024 # 25 MB limit
 
 ALLOWED_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
 
@@ -54,17 +53,15 @@ def api_encrypt():
     orig_path, _, orig_ext = _save_upload(original, "orig-")
     cover_path, _, _ = _save_upload(cover, "cov-")
 
-    # baca BYTES asli (tanpa re-encode) agar dekripsi mengembalikan file yang sama persis
     with open(orig_path, "rb") as f:
         original_bytes = f.read()
-
     try:
         stego_png_bytes = embed_lsb_2bit(cover_path, original_bytes, orig_ext, secret)
     except ValueError as e:
         return jsonify(ok=False, error=str(e)), 422
 
     file_id  = uuid.uuid4().hex
-    out_name = f"stego-{file_id}.png"  # selalu PNG agar LSB aman
+    out_name = f"stego-{file_id}.png"
     out_path = os.path.join(OUTPUT_DIR, out_name)
     with open(out_path, "wb") as f:
         f.write(stego_png_bytes)
@@ -100,7 +97,7 @@ def api_decrypt():
     with open(out_path, "wb") as f:
         f.write(original_bytes)
 
-    # preview hanya kalau memang image yang umum
+
     is_img = (ext.lower() in ("png","jpg","jpeg","webp"))
     body = {
         "ok": True,
